@@ -4,14 +4,17 @@ const SYMBOLS =
 	'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+'
 
 function generateSecretWord(wordLength, symbolCount) {
-	const symbols = SYMBOLS.substring(0, symbolCount)
-	let secretWord = ''
-	for (let i = 0; i < wordLength; i++) {
-		const index = Math.floor(Math.random() * symbols.length)
-		secretWord += symbols.charAt(index)
-		symbols.replace(symbols.charAt(index), '')
+	const allSymbols = SYMBOLS.substring(0, symbolCount)
+	const symbols = []
+	while (symbols.length < wordLength) {
+		const symbol = allSymbols.charAt(
+			Math.floor(Math.random() * allSymbols.length)
+		)
+		if (!symbols.includes(symbol)) {
+			symbols.push(symbol)
+		}
 	}
-	return secretWord
+	return symbols.join('')
 }
 
 function calculateCorrect(guess, secretWord) {
