@@ -1,180 +1,163 @@
 import React, { useState } from 'react'
 
-const SYMBOLS =
-	'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+'
-
-function generateSecretWord(wordLength, symbolCount) {
-	const allSymbols = SYMBOLS.substring(0, symbolCount)
-	const symbols = []
-	while (symbols.length < wordLength) {
-		const symbol = allSymbols.charAt(
-			Math.floor(Math.random() * allSymbols.length)
-		)
-		if (!symbols.includes(symbol)) {
-			symbols.push(symbol)
-		}
-	}
-	return symbols.join('')
-}
-
-function calculateCorrect(guess, secretWord) {
-	let correct = 0
-	for (let i = 0; i < secretWord.length; i++) {
-		if (guess.includes(secretWord.charAt(i))) {
-			correct++
-		}
-	}
-	return correct
-}
-
-function calculateCorrectlyPositioned(guess, secretWord) {
-	let correctlyPositioned = 0
-	for (let i = 0; i < secretWord.length; i++) {
-		if (guess.charAt(i) === secretWord.charAt(i)) {
-			correctlyPositioned++
-		}
-	}
-	return correctlyPositioned
-}
-
-function GuessingGame() {
+function App() {
 	const [wordLength, setWordLength] = useState(4)
-	const [symbolCount, setSymbolCount] = useState(10)
+	const [numSymbols, setNumSymbols] = useState(10)
 	const [secretWord, setSecretWord] = useState(
-		generateSecretWord(wordLength, symbolCount)
+		generateSecretWord(wordLength, numSymbols)
 	)
 	const [guess, setGuess] = useState('')
 	const [guesses, setGuesses] = useState([])
-	const [gameOver, setGameOver] = useState(false)
+	const [results, setResults] = useState([])
 	const [score, setScore] = useState(0)
-	const [message, setMessage] = useState('')
+	const [gameOver, setGameOver] = useState(false)
 
-	function handleWordLengthChange(event) {
-		setWordLength(parseInt(event.target.value))
+	function generateSecretWord(length, numSymbols) {
+		let symbols = '0123456789'
+		for (let i = 97; i <= 122 && symbols.length < numSymbols; i++) {
+			symbols += String.fromCharCode(i)
+		}
+		for (let i = 65; i <= 90 && symbols.length < numSymbols; i++) {
+			symbols += String.fromCharCode(i)
+		}
+		const secret = []
+		while (secret.length < length) {
+			const symbol = symbols[Math.floor(Math.random() * symbols.length)]
+			if (!secret.includes(symbol)) {
+				secret.push(symbol)
+			}
+		}
+		return secret.join('')
 	}
 
-	function handleSymbolCountChange(event) {
-		setSymbolCount(parseInt(event.target.value))
-	}
-
-	function handleSettingsSubmit(event) {
-		event.preventDefault()
-		if (symbolCount >= wordLength) {
-			setSecretWord(generateSecretWord(wordLength, symbolCount))
+	function submitSettings() {
+		if (numSymbols >= wordLength) {
+			setSecretWord(generateSecretWord(wordLength, numSymbols))
 			setGuess('')
 			setGuesses([])
-			setGameOver(false)
+			setResults([])
 			setScore(0)
-			setMessage('')
+			setGameOver(false)
 		}
 	}
 
-	function handleGuessChange(event) {
-		setGuess(event.target.value.substring(0, wordLength))
-	}
-
-	function handleGuessSubmit(event) {
-		event.preventDefault()
+	function submitGuess() {
 		if (guess.length === wordLength) {
-			const correct = calculateCorrect(guess, secretWord)
-			const correctlyPositioned = calculateCorrectlyPositioned(
-				guess,
-				secretWord
-			)
-			setGuesses([...guesses, { guess, correct, correctlyPositioned }])
-			if (guess === secretWord) {
+			const correctSymbols = []
+			const correctPositions = []
+			for (let i = 0; i < wordLength; i++) {
+				if (guess[i] === secretWord[i]) {
+					correctPositions.push(i)
+				} else if (
+					secretWord.includes(guess[i]) &&
+					!correctPositions.includes(i)
+				) {
+					correctSymbols.push(i)
+				}
+			}
+			setGuesses([...guesses, guess])
+			setResults([
+				...results,
+				{
+					correctSymbols: correctSymbols.length,
+					correctPositions: correctPositions.length,
+				},
+			])
+			setGuess('')
+			if (correctPositions.length === wordLength) {
+				setScore(guesses.length + 1)
 				setGameOver(true)
-				setMessage(`You win in ${guesses.length + 1} guesses!`)
-			} else {
-				setGuess('')
-				setScore(score + 1)
 			}
 		}
 	}
 
-	function handleResignClick() {
+	function resign() {
 		setGameOver(true)
-		setMessage(
-			`The secret word was ${secretWord}. You lost after ${guesses.length} guesses.`
-		)
 	}
 
-	function handleTryAgainClick() {
-		setWordLength(4)
-		setSymbolCount(10)
-		setSecretWord(generateSecretWord(4, 10))
+	function tryAgain() {
+		setSecretWord(generateSecretWord(wordLength, numSymbols))
 		setGuess('')
 		setGuesses([])
-		setGameOver(false)
+		setResults([])
 		setScore(0)
-		setMessage('')
+		setGameOver(false)
 	}
 
 	return (
-		<div>
+		<div className='App'>
 			{gameOver ? (
-				<div>
-					<p>{message}</p>
-					<button onClick={handleTryAgainClick}>Try Again</button>
+				<div className='game-over-screen'>
+					<h2>{score === 0 ? 'Resigned' : 'You win!'}</h2>
+					<p>Secret word: {secretWord}</p>
+					<p>Score: {score}</p>
+					<button onClick={tryAgain}>Try again</button>
 				</div>
 			) : (
 				<div>
-					<p>Score: {score}</p>
-					<form onSubmit={handleGuessSubmit}>
-						<label>
-							Guess:
-							<input
-								type='text'
-								value={guess}
-								onChange={handleGuessChange}
-							/>
+					<h2>Guess the word</h2>
+					<div className='settings'>
+						<label htmlFor='word-length-slider'>
+							Word length: {wordLength}
 						</label>
-						<button type='submit'>Guess</button>
-					</form>
-					<ul>
-						{guesses.map((item, index) => (
-							<li key={index}>
-								{item.guess} - correct: {item.correct}, correctly positioned:{' '}
-								{item.correctlyPositioned}
-							</li>
-						))}
-					</ul>
-					<button onClick={handleResignClick}>Resign</button>
-				</div>
-			)}
-			{!gameOver && (
-				<div>
-					<p>Settings</p>
-					<form onSubmit={handleSettingsSubmit}>
-						<label>
-							Word Length:
-							<input
-								type='number'
-								min='1'
-								max='20'
-								value={wordLength}
-								onChange={handleWordLengthChange}
-							/>
+						<input
+							id='word-length-slider'
+							type='range'
+							min='1'
+							max='20'
+							step='1'
+							value={wordLength}
+							onChange={(event) => setWordLength(Number(event.target.value))}
+						/>
+						<label htmlFor='num-symbols-slider'>
+							Number of symbols: {numSymbols}
 						</label>
-						<br />
-						<label>
-							Symbol Count:
-							<input
-								type='number'
-								min='1'
-								max='62'
-								value={symbolCount}
-								onChange={handleSymbolCountChange}
-							/>
-						</label>
-						<br />
-						<button type='submit'>Submit</button>
-					</form>
-					<p>Symbols in use: {SYMBOLS.substring(0, symbolCount)}</p>
+						<input
+							id='num-symbols-slider'
+							type='range'
+							min='10'
+							max='62'
+							step='1'
+							value={numSymbols}
+							onChange={(event) => setNumSymbols(Number(event.target.value))}
+						/>
+						<button onClick={submitSettings}>Submit</button>
+					</div>
+					<div className='guesses'>
+						<ul>
+							{guesses.map((guess, index) => (
+								<li key={index}>
+									{guess} - {results[index].correctSymbols} correct symbol
+									{results[index].correctSymbols !== 1 && 's'},{' '}
+									{results[index].correctPositions} correct position
+									{results[index].correctPositions !== 1 && 's'}
+								</li>
+							))}
+						</ul>
+					</div>
+					<div className='input'>
+						<input
+							type='text'
+							maxLength={wordLength}
+							value={guess}
+							onChange={(event) => setGuess(event.target.value)}
+						/>
+						<button onClick={submitGuess}>Guess</button>
+						<button onClick={resign}>Resign</button>
+					</div>
+					<p>
+						Symbols in the game:{' '}
+						{numSymbols <= 10
+							? '0123456789'
+							: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.substring(
+									0,
+									numSymbols
+							  )}
+					</p>
 				</div>
 			)}
 		</div>
 	)
 }
 
-export default GuessingGame
+export default App
