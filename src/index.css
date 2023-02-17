@@ -135,3 +135,135 @@ body {
   font-weight: bold;
   cursor: pointer;
 }
+
+/* Landscape */
+@media only screen and (min-width: 480px) {
+
+  /* Game container */
+  .game-container {
+    max-width: 80vw;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Guess input */
+  .guess-input {
+    font-size: 24px;
+    padding: 10px;
+  }
+
+  /* Guess button */
+  .guess-button {
+    font-size: 20px;
+    margin-top: 10px;
+    padding: 10px;
+  }
+
+  /* Settings menu */
+  .settings-menu {
+    margin: 20px 0;
+  }
+
+  /* Settings label */
+  .settings-label {
+    font-size: 16px;
+  }
+
+  /* Settings input */
+  .settings-input {
+    margin-left: 10px;
+    font-size: 16px;
+  }
+
+  /* Settings button */
+  .settings-button {
+    font-size: 16px;
+    margin-left: 10px;
+    padding: 5px 10px;
+  }
+
+  /* History container */
+  .history-container {
+    margin-top: 20px;
+  }
+
+  /* History table */
+  .history-table {
+    width: 100%;
+  }
+
+  /* History table cell */
+  .history-cell {
+    padding: 5px;
+    font-size: 16px;
+  }
+}
+
+/* Portrait */
+@media only screen and (max-width: 479px) {
+
+  /* Game container */
+  .game-container {
+    max-width: 90vw;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Guess input */
+  .guess-input {
+    font-size: 18px;
+    padding: 8px;
+  }
+
+  /* Guess button */
+  .guess-button {
+    font-size: 16px;
+    margin-top: 10px;
+    padding: 8px;
+  }
+
+  /* Settings menu */
+  .settings-menu {
+    margin: 20px 0;
+  }
+
+  /* Settings label */
+  .settings-label {
+    font-size: 14px;
+  }
+
+  /* Settings input */
+  .settings-input {
+    margin-left: 10px;
+    font-size: 14px;
+  }
+
+  /* Settings button */
+  .settings-button {
+    font-size: 14px;
+    margin-left: 10px;
+    padding: 5px 8px;
+  }
+
+  /* History container */
+  .history-container {
+    margin-top: 20px;
+  }
+
+  /* History table */
+  .history-table {
+    width: 100%;
+  }
+
+  /* History table cell */
+  .history-cell {
+    padding: 5px;
+    font-size: 14px;
+  }
+}
